@@ -22,13 +22,12 @@ class BrandController extends AbstractController
     #[Route('/brands', name: 'app_brands', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Retourne tous les marques.',
+        description: 'Listes toutes les marques.',
         content: new OA\JsonContent(
             type: 'array',
             items: new OA\Items(ref: new Model(type: Brand::class, groups: ['pen:read']))
         )
     )]
-
     #[OA\Tag(name: 'Brand')]
     #[Security(name: 'Bearer')]
     public function index(BrandRepository $brandRepository): JsonResponse
@@ -43,6 +42,15 @@ class BrandController extends AbstractController
         ]);
     }
 
+    #[OA\Response(
+        response: 200,
+        description: 'Liste une marque.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['pen:read']))
+        )
+    )]
+    #[OA\Tag(name: 'Brand')]
     #[Route('/brand/{id}', name: 'app_brand_get', methods:['GET'])]
     public function get(Brand $brand): JsonResponse{
             return $this->json($brand, context:[
@@ -51,6 +59,24 @@ class BrandController extends AbstractController
     }
 
     #[Route('/brands', name: 'app_brand_add', methods: ['POST'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Créer une marque.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['pen:create', 'brand:create']))
+        )
+    )]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Brand::class,
+                    groups: ['pen:create'],
+                )
+            )
+        )
+    )]
     #[OA\Tag(name: 'Brand')]
     public function add(
         Request $request,
@@ -84,6 +110,24 @@ class BrandController extends AbstractController
     }
 
     #[Route('/brand/{id}', name: 'app_brand_update', methods: ['PUT','PATCH'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Mets a jour les marques.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['pen:update', 'brand:update']))
+        )
+    )]
+    #[OA\Put(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Brand::class,
+                    groups: ['pen:update'],
+                )
+            )
+        )
+    )]
     #[OA\Tag(name: 'Brand')]
     public function update(
         Brand $brand,

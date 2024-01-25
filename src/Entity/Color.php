@@ -14,10 +14,11 @@ class Color
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['pen:read', 'color:create', 'color:update'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update','color:create', 'color:update'])]
     private ?string $name = null;
 
     #[ORM\ManyToMany(targetEntity: Pen::class, mappedBy: 'color')]

@@ -45,7 +45,17 @@ class PenController extends AbstractController
         ]);
     }
 
+    
     #[Route('/pen/{id}', name: 'app_pen_get', methods:['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne tous les stylos.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Pen::class, groups: ['pen:read']))
+        )
+    )]
+    #[OA\Tag(name: 'Stylos')]
     public function get(Pen $pen): JsonResponse{
             return $this->json($pen, context:[
                 'groups' => ['pen:read'],
@@ -53,6 +63,24 @@ class PenController extends AbstractController
     }
 
     #[Route('/pens', name: 'app_pen_add', methods: ['POST'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Créer un stylo',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Pen::class, groups: ['pen:create']))
+        )
+    )]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Pen::class,
+                    groups: ['pen:create']
+                )
+            )
+        )
+    )]
     #[OA\Tag(name: 'Stylos')]
     public function add(
         Request $request,
@@ -113,7 +141,7 @@ class PenController extends AbstractController
             $em->flush();
 
             return $this->json($pen, context:[
-                'groups' => ['pen:read'],
+                'groups' => ['pen:create'],
             ]);
         } catch (\Exception $e) {
             return $this->json([
@@ -124,6 +152,24 @@ class PenController extends AbstractController
     }
 
     #[Route('/pen/{id}', name: 'app_pen_update', methods: ['PUT','PATCH'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Mets a jour les stylos.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Pen::class, groups: ['pen:update']))
+        )
+    )]
+    #[OA\Put(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Pen::class,
+                    groups: ['pen:update'],
+                )
+            )
+        )
+    )]
     #[OA\Tag(name: 'Stylos')]
     public function update(
         Pen $pen,
@@ -182,7 +228,7 @@ class PenController extends AbstractController
             $em->flush();
 
             return $this->json($pen, context:[
-                'groups' => ['pen:read'],
+                'groups' => ['pen:update'],
             ]);
         } catch (\Exception $e) {
             return $this->json([

@@ -14,10 +14,11 @@ class Type
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['pen:read','type:create','type:update'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update','type:create','type:update'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'Type', targetEntity: Pen::class)]

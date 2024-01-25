@@ -14,42 +14,42 @@ class Pen
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read','pen:create', 'pen:update'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update'])]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update'])]
     private ?float $price = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 10, unique: TRUE)]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update'])]
     private ?string $ref = null;
 
     #[ORM\ManyToOne(inversedBy: 'pens')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update'])]
     private ?Type $Type = null;
 
     #[ORM\ManyToOne(inversedBy: 'pens')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update'])]
     private ?Material $material = null;
 
     #[ORM\ManyToMany(targetEntity: Color::class, inversedBy: 'pens')]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update'])]
     private Collection $color;
 
     #[ORM\ManyToOne(inversedBy: 'pens')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update'])]
     private ?Brand $brand = null;
 
     public function __construct()
@@ -162,7 +162,7 @@ class Pen
 
         $this->color->clear();
         return $this;
-        
+
     }
 
     public function getBrand(): ?Brand

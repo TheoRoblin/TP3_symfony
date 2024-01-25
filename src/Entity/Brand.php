@@ -14,10 +14,11 @@ class Brand
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['pen:read', 'brand:create', 'brand:update'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups('pen:read')]
+    #[Groups(['pen:read', 'pen:create', 'pen:update','brand:create', 'brand:update'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Pen::class)]

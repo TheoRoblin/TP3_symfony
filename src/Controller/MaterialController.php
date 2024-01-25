@@ -21,7 +21,7 @@ class MaterialController extends AbstractController
     #[Route('/materials', name: 'app_materials', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Retourne tous les materials.',
+        description: 'Liste tout les materiels.',
         content: new OA\JsonContent(
             type: 'array',
             items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:read']))
@@ -42,6 +42,15 @@ class MaterialController extends AbstractController
     }
 
     #[Route('/material/{id}', name: 'app_material_get', methods:['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Liste un seul materiel.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:read']))
+        )
+    )]
+    #[OA\Tag(name: 'Material')]
     public function get(Material $material): JsonResponse{
             return $this->json($material, context:[
                 'groups' => ['pen:read'],
@@ -49,6 +58,24 @@ class MaterialController extends AbstractController
     }
 
     #[Route('/materials', name: 'app_material_add', methods: ['POST'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Creer un materiel.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:create','material:create']))
+        )
+    )]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Material::class,
+                    groups: ['pen:create'],
+                )
+            )
+        )
+    )]
     #[OA\Tag(name: 'Material')]
     public function add(
         Request $request,
@@ -82,6 +109,24 @@ class MaterialController extends AbstractController
     }
 
     #[Route('/material/{id}', name: 'app_material_update', methods: ['PUT','PATCH'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Mets a jour les materiels.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:update','material:update']))
+        )
+    )]
+    #[OA\Put(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Material::class,
+                    groups: ['pen:update'],
+                )
+            )
+        )
+    )]
     #[OA\Tag(name: 'Material')]
     public function update(
         Material $material,

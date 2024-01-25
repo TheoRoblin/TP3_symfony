@@ -4,6 +4,7 @@ nelmio_api_doc:
             title: Documentation
             description: API documentation
             version: 1.0.0
+
         components:
             securitySchemes:
                 Bearer:
