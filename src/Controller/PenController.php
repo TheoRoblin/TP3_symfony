@@ -4,12 +4,13 @@ namespace App\Controller;
 
 use Faker\Factory;
 use App\Entity\Pen;
+use App\Service\PenService;
 use OpenApi\Attributes as OA;
 use App\Repository\PenRepository;
 use App\Repository\TypeRepository;
-use App\Repository\MaterialRepository;
 use App\Repository\BrandRepository;
 use App\Repository\ColorRepository;
+use App\Repository\MaterialRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -33,11 +34,9 @@ class PenController extends AbstractController
     )]
     #[OA\Tag(name: 'Stylos')]
     #[Security(name: 'Bearer')]
-    public function index(PenRepository $penRepository): JsonResponse
+    public function index(PenService $penService,): JsonResponse
     {
-
-        $pens = $penRepository->findAll();
-
+        $pens = $penService->index();
         return $this->json([
             'pens'=>$pens,
         ], context:[
@@ -84,61 +83,13 @@ class PenController extends AbstractController
     #[OA\Tag(name: 'Stylos')]
     public function add(
         Request $request,
-        EntityManagerInterface $em,
-        TypeRepository $typeRepository,
-        MaterialRepository $materiaRepository,
-        BrandRepository $BrandRepository,
-        ColorRepository $colorRepository,
+        PenService $penService,
     ): JsonResponse {
         try {
             // On recupère les données du corps de la requête
             // Que l'on transforme ensuite en tableau associatif
-            $data = json_decode($request->getContent(), true);
 
-            $faker = Factory::create();
-
-            // On traite les données pour créer un nouveau Stylo
-            $pen = new Pen();
-            $pen->setName($data['name']);
-            $pen->setPrice($data['price']);
-            $pen->setDescription($data['description']);
-            $pen->setRef($faker->unique()->ean13);
-
-            if(!empty($data['type'])) {
-                $type= $typeRepository->find($data['type']);
-                if(!$type) {
-                    throw new \Exception('Type non valide');
-                }
-                $pen->setType($type);
-            }
-
-            if(!empty($data['material'])) {
-                $material= $materiaRepository->find($data['material']);
-                if(!$material) {
-                    throw new \Exception('Materiel non valide');
-                }
-                $pen->setMaterial($material);
-            }
-
-            if(!empty($data['brand'])) {
-                $brand= $BrandRepository->find($data['brand']);
-                if(!$brand) {
-                    throw new \Exception('Materiel non valide');
-                }
-                $pen->setBrand($brand);
-            }
-
-            if (!empty($data['color'])) {
-                foreach($data['color'] as $colorId) {
-                    $color = $colorRepository->find($colorId);
-                    if (!$color)
-                        throw new \Exception('Couleur(s) non valide');
-                    $pen->addColor($color);
-                }
-            }
-
-            $em->persist($pen);
-            $em->flush();
+            $pen = $penService->createFromJsonString($request->getContent());
 
             return $this->json($pen, context:[
                 'groups' => ['pen:create'],
@@ -174,58 +125,10 @@ class PenController extends AbstractController
     public function update(
         Pen $pen,
         Request $request,
-        EntityManagerInterface $em,
-        TypeRepository $typeRepository,
-        MaterialRepository $materiaRepository,
-        BrandRepository $brandRepository,
-        ColorRepository $colorRepository,
+        PenService $penService,
     ): JsonResponse {
         try {
-            // On recupère les données du corps de la requête
-            // Que l'on transforme ensuite en tableau associatif
-            $data = json_decode($request->getContent(), true);
-
-            // On traite les données pour créer un nouveau Stylo
-            $pen->setName($data['name']);
-            $pen->setPrice($data['price']);
-            $pen->setDescription($data['description']);
-
-            if(!empty($data['type'])) {
-                $type= $typeRepository->find($data['type']);
-                if(!$type) {
-                    throw new \Exception('Type non valide');
-                }
-                $pen->setType($type);
-            }
-
-            if(!empty($data['material'])) {
-                $material= $materiaRepository->find($data['material']);
-                if(!$material) {
-                    throw new \Exception('Materiel non valide');
-                }
-                $pen->setMaterial($material);
-            }
-
-            if(!empty($data['brand'])) {
-                $brand= $brandRepository->find($data['brand']);
-                if(!$brand) {
-                    throw new \Exception('Materiel non valide');
-                }
-                $pen->setBrand($brand);
-            }
-
-            if (!empty($data['color'])) {
-                $pen->resetColors();
-                foreach($data['color'] as $colorId) {
-                    $color = $colorRepository->find($colorId);
-                    if (!$color)
-                        throw new \Exception('Couleur(s) non valide');
-                    $pen->addColor($color);
-                }
-            }
-
-            $em->persist($pen);
-            $em->flush();
+            $penService->updateWithJsonData($pen, $request->getContent());
 
             return $this->json($pen, context:[
                 'groups' => ['pen:update'],
@@ -240,9 +143,8 @@ class PenController extends AbstractController
 
     #[Route('/pen/{id}', name: 'app_pen_delete', methods: ['DELETE'])]
     #[OA\Tag(name: 'Stylos')]
-    public function delete(Pen $pen, EntityManagerInterface $em): JsonResponse{
-        $em->remove($pen);
-        $em->flush();
+    public function delete(Pen $pen, PenService $penService,): JsonResponse{
+        $penService ->delete($pen, $request->getContent());
         return $this->json([
             'code'=> 200,
             'message'=> 'Stylo supprimé',
