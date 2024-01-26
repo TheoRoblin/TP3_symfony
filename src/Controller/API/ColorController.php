@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\API;
 
 use Faker\Factory;
-use App\Entity\Material;
+use App\Entity\Color;
 use OpenApi\Attributes as OA;
-use App\Repository\MaterialRepository;
-use App\Repository\TypeRepository;
+use App\Repository\ColorRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -16,71 +15,70 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/api', name:'app_api')]
-class MaterialController extends AbstractController
+class ColorController extends AbstractController
 {
-    #[Route('/materials', name: 'app_materials', methods: ['GET'])]
+    #[Route('/colors', name: 'app_colors', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Liste tout les materiels.',
+        description: 'Lecture de toute les couleurs.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:read']))
+            items: new OA\Items(ref: new Model(type: Color::class, groups: ['pen:read']))
         )
     )]
-
-    #[OA\Tag(name: 'Material')]
+    #[OA\Tag(name: 'Colors')]
     #[Security(name: 'Bearer')]
-    public function index(MaterialRepository $materialRepository): JsonResponse
+    public function index(ColorRepository $colorRepository): JsonResponse
     {
-        $materials = $materialRepository->findAll();
+        $colors = $colorRepository->findAll();
 
         return $this->json([
-            'materials'=>$materials,
+            'colors'=>$colors,
         ], context:[
             'groups'=> ['pen:read']
         ]);
     }
 
-    #[Route('/material/{id}', name: 'app_material_get', methods:['GET'])]
+    #[Route('/color/{id}', name: 'app_color_get', methods:['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Liste un seul materiel.',
+        description: 'Lecture de une seule couleur.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:read']))
+            items: new OA\Items(ref: new Model(type: Color::class, groups: ['pen:read']))
         )
     )]
-    #[OA\Tag(name: 'Material')]
-    public function get(Material $material): JsonResponse{
-            return $this->json($material, context:[
+    #[OA\Tag(name: 'Colors')]
+    public function get(Color $color): JsonResponse{
+            return $this->json($color, context:[
                 'groups' => ['pen:read'],
             ]);
     }
 
-    #[Route('/materials', name: 'app_material_add', methods: ['POST'])]
+    #[Route('/colors', name: 'app_colors_add', methods: ['POST'])]
     #[OA\Response(
         response: 200,
-        description: 'Creer un materiel.',
+        description: 'Créer une couleur.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:create','material:create']))
+            items: new OA\Items(ref: new Model(type: Color::class, groups: ['pen:create', 'color:create']))
         )
     )]
     #[OA\Post(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Material::class,
+                    type: Color::class,
                     groups: ['pen:create'],
                 )
             )
         )
     )]
-    #[OA\Tag(name: 'Material')]
+    #[OA\Tag(name: 'Colors')]
     public function add(
         Request $request,
         EntityManagerInterface $em,
-        MaterialRepository $materialRepository,
+        ColorRepository $colorRepository,
     ): JsonResponse {
         try {
             // On recupère les données du corps de la requête
@@ -90,14 +88,14 @@ class MaterialController extends AbstractController
             $faker = Factory::create();
 
             // On traite les données pour créer un nouveau Stylo
-            $material = new Material();
-            $material->setName($data['name']);
+            $color = new Color();
+            $color->setName($data['name']);
 
             
-            $em->persist($material);
+            $em->persist($color);
             $em->flush();
 
-            return $this->json($material, context:[
+            return $this->json($color, context:[
                 'groups' => ['pen:read'],
             ]);
         } catch (\Exception $e) {
@@ -108,31 +106,31 @@ class MaterialController extends AbstractController
         }
     }
 
-    #[Route('/material/{id}', name: 'app_material_update', methods: ['PUT','PATCH'])]
+    #[Route('/color/{id}', name: 'app_color_update', methods: ['PUT','PATCH'])]
     #[OA\Response(
         response: 200,
-        description: 'Mets a jour les materiels.',
+        description: 'Mets a jour les couleurs.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:update','material:update']))
+            items: new OA\Items(ref: new Model(type: Color::class, groups: ['pen:update','color:update']))
         )
     )]
     #[OA\Put(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Material::class,
+                    type: Color::class,
                     groups: ['pen:update'],
                 )
             )
         )
     )]
-    #[OA\Tag(name: 'Material')]
+    #[OA\Tag(name: 'Colors')]
     public function update(
-        Material $material,
+        Color $color,
         Request $request,
         EntityManagerInterface $em,
-        MaterialRepository $materialRepository,
+        ColorRepository $colorRepository,
     ): JsonResponse {
         try {
             // On recupère les données du corps de la requête
@@ -140,12 +138,12 @@ class MaterialController extends AbstractController
             $data = json_decode($request->getContent(), true);
 
             // On traite les données pour créer un nouveau Stylo
-            $material->setName($data['name']);
+            $color->setName($data['name']);
     
-            $em->persist($material);
+            $em->persist($color);
             $em->flush();
 
-            return $this->json($material, context:[
+            return $this->json($color, context:[
                 'groups' => ['pen:read'],
             ]);
         } catch (\Exception $e) {
@@ -156,14 +154,14 @@ class MaterialController extends AbstractController
         }
     }
 
-    #[Route('/material/{id}', name: 'app_material_delete', methods: ['DELETE'])]
-    #[OA\Tag(name: 'Material')]
-    public function delete(Material $material, EntityManagerInterface $em): JsonResponse{
-        $em->remove($material);
+    #[Route('/color/{id}', name: 'app_color_delete', methods: ['DELETE'])]
+    #[OA\Tag(name: 'Colors')]
+    public function delete(Color $color, EntityManagerInterface $em): JsonResponse{
+        $em->remove($color);
         $em->flush();
         return $this->json([
             'code'=> 200,
-            'message'=> 'Materiel supprimé',
+            'message'=> 'Couleur supprimé',
         ]);
     }
 }

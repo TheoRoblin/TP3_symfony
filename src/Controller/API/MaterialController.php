@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\API;
 
 use Faker\Factory;
-use App\Entity\Brand;
+use App\Entity\Material;
 use OpenApi\Attributes as OA;
-use App\Repository\BrandRepository;
-use App\Repository\TypeRepository;
 use App\Repository\MaterialRepository;
+use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -17,71 +16,71 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/api', name:'app_api')]
-class BrandController extends AbstractController
+class MaterialController extends AbstractController
 {
-    #[Route('/brands', name: 'app_brands', methods: ['GET'])]
+    #[Route('/materials', name: 'app_materials', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Listes toutes les marques.',
+        description: 'Liste tout les materiels.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['pen:read']))
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:read']))
         )
     )]
-    #[OA\Tag(name: 'Brand')]
-    #[Security(name: 'Bearer')]
-    public function index(BrandRepository $brandRepository): JsonResponse
-    {
 
-        $brands = $brandRepository->findAll();
+    #[OA\Tag(name: 'Material')]
+    #[Security(name: 'Bearer')]
+    public function index(MaterialRepository $materialRepository): JsonResponse
+    {
+        $materials = $materialRepository->findAll();
 
         return $this->json([
-            'brands'=>$brands,
+            'materials'=>$materials,
         ], context:[
             'groups'=> ['pen:read']
         ]);
     }
 
+    #[Route('/material/{id}', name: 'app_material_get', methods:['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Liste une marque.',
+        description: 'Liste un seul materiel.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['pen:read']))
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:read']))
         )
     )]
-    #[OA\Tag(name: 'Brand')]
-    #[Route('/brand/{id}', name: 'app_brand_get', methods:['GET'])]
-    public function get(Brand $brand): JsonResponse{
-            return $this->json($brand, context:[
+    #[OA\Tag(name: 'Material')]
+    public function get(Material $material): JsonResponse{
+            return $this->json($material, context:[
                 'groups' => ['pen:read'],
             ]);
     }
 
-    #[Route('/brands', name: 'app_brand_add', methods: ['POST'])]
+    #[Route('/materials', name: 'app_material_add', methods: ['POST'])]
     #[OA\Response(
         response: 200,
-        description: 'Créer une marque.',
+        description: 'Creer un materiel.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['pen:create', 'brand:create']))
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:create','material:create']))
         )
     )]
     #[OA\Post(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Brand::class,
+                    type: Material::class,
                     groups: ['pen:create'],
                 )
             )
         )
     )]
-    #[OA\Tag(name: 'Brand')]
+    #[OA\Tag(name: 'Material')]
     public function add(
         Request $request,
         EntityManagerInterface $em,
-        BrandRepository $brandRepository,
+        MaterialRepository $materialRepository,
     ): JsonResponse {
         try {
             // On recupère les données du corps de la requête
@@ -91,14 +90,14 @@ class BrandController extends AbstractController
             $faker = Factory::create();
 
             // On traite les données pour créer un nouveau Stylo
-            $brand = new Brand();
-            $brand->setName($data['name']);
+            $material = new Material();
+            $material->setName($data['name']);
 
             
-            $em->persist($brand);
+            $em->persist($material);
             $em->flush();
 
-            return $this->json($brand, context:[
+            return $this->json($material, context:[
                 'groups' => ['pen:read'],
             ]);
         } catch (\Exception $e) {
@@ -109,31 +108,31 @@ class BrandController extends AbstractController
         }
     }
 
-    #[Route('/brand/{id}', name: 'app_brand_update', methods: ['PUT','PATCH'])]
+    #[Route('/material/{id}', name: 'app_material_update', methods: ['PUT','PATCH'])]
     #[OA\Response(
         response: 200,
-        description: 'Mets a jour les marques.',
+        description: 'Mets a jour les materiels.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['pen:update', 'brand:update']))
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['pen:update','material:update']))
         )
     )]
     #[OA\Put(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Brand::class,
+                    type: Material::class,
                     groups: ['pen:update'],
                 )
             )
         )
     )]
-    #[OA\Tag(name: 'Brand')]
+    #[OA\Tag(name: 'Material')]
     public function update(
-        Brand $brand,
+        Material $material,
         Request $request,
         EntityManagerInterface $em,
-        BrandRepository $brandRepository,
+        MaterialRepository $materialRepository,
     ): JsonResponse {
         try {
             // On recupère les données du corps de la requête
@@ -141,12 +140,12 @@ class BrandController extends AbstractController
             $data = json_decode($request->getContent(), true);
 
             // On traite les données pour créer un nouveau Stylo
-            $brand->setName($data['name']);
+            $material->setName($data['name']);
     
-            $em->persist($brand);
+            $em->persist($material);
             $em->flush();
 
-            return $this->json($brand, context:[
+            return $this->json($material, context:[
                 'groups' => ['pen:read'],
             ]);
         } catch (\Exception $e) {
@@ -157,14 +156,14 @@ class BrandController extends AbstractController
         }
     }
 
-    #[Route('/brand/{id}', name: 'app_brand_delete', methods: ['DELETE'])]
-    #[OA\Tag(name: 'Brand')]
-    public function delete(Brand $brand, EntityManagerInterface $em): JsonResponse{
-        $em->remove($brand);
+    #[Route('/material/{id}', name: 'app_material_delete', methods: ['DELETE'])]
+    #[OA\Tag(name: 'Material')]
+    public function delete(Material $material, EntityManagerInterface $em): JsonResponse{
+        $em->remove($material);
         $em->flush();
         return $this->json([
             'code'=> 200,
-            'message'=> 'Marque supprimé',
+            'message'=> 'Materiel supprimé',
         ]);
     }
 }

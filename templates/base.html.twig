@@ -11,6 +11,26 @@
         {% endblock %}
     </head>
     <body>
+    {% if app.user %}
+    <header>
+        <nav>
+            <div class="mb-3">
+                Bienvenue! Vous êtes connecté avec {{ app.user.userIdentifier }}.
+            </div>
+            <ul>
+                <li><a href="{{ '/api/doc' }}">Documentation</a></li>
+                <li><a href="{{ path('app_admin_dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ path('app_user_index') }}">User</a></li>
+                <li><a href="{{ path('app_brand_admin_index') }}">Brand</a></li>
+                <li><a href="{{ path('app_color_admin_index') }}">Color</a></li>
+                <li><a href="{{ path('app_type_admin_index') }}">Type</a></li>
+                <li><a href="{{ path('app_material_admin_index') }}">Material</a></li>
+                <li><a href="{{ path('app_pen_admin_index') }}">Pen</a></li>
+                <li><a href="{{ path('app_logout') }}">Deconnexion</a></li>
+            </ul>
+        </nav>
+    </header>
+{% endif %}
         {% block body %}{% endblock %}
     </body>
 </html>

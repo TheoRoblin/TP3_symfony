@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\API;
 
 use Faker\Factory;
-use App\Entity\Color;
+use App\Entity\Type;
 use OpenApi\Attributes as OA;
-use App\Repository\ColorRepository;
+use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -15,70 +15,70 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/api', name:'app_api')]
-class ColorController extends AbstractController
+class TypeController extends AbstractController
 {
-    #[Route('/colors', name: 'app_colors', methods: ['GET'])]
+    #[Route('/types', name: 'app_types', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Lecture de toute les couleurs.',
+        description: 'Retourne tous les types.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Color::class, groups: ['pen:read']))
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['pen:read']))
         )
     )]
-    #[OA\Tag(name: 'Colors')]
+    #[OA\Tag(name: 'Type')]
     #[Security(name: 'Bearer')]
-    public function index(ColorRepository $colorRepository): JsonResponse
+    public function index(TypeRepository $typeRepository): JsonResponse
     {
-        $colors = $colorRepository->findAll();
+        $types = $typeRepository->findAll();
 
         return $this->json([
-            'colors'=>$colors,
+            'types'=>$types,
         ], context:[
             'groups'=> ['pen:read']
         ]);
     }
 
-    #[Route('/color/{id}', name: 'app_color_get', methods:['GET'])]
+    #[Route('/type/{id}', name: 'app_type_get', methods:['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Lecture de une seule couleur.',
+        description: 'Retourne un seul type de stylo.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Color::class, groups: ['pen:read']))
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['pen:read']))
         )
     )]
-    #[OA\Tag(name: 'Colors')]
-    public function get(Color $color): JsonResponse{
-            return $this->json($color, context:[
+    #[OA\Tag(name: 'Type')]
+    public function get(Type $type): JsonResponse{
+            return $this->json($type, context:[
                 'groups' => ['pen:read'],
             ]);
     }
 
-    #[Route('/colors', name: 'app_colors_add', methods: ['POST'])]
+    #[Route('/types', name: 'app_types_add', methods: ['POST'])]
     #[OA\Response(
         response: 200,
-        description: 'Créer une couleur.',
+        description: 'Creer des styles de stylo.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Color::class, groups: ['pen:create', 'color:create']))
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['pen:create','type:create']))
         )
     )]
     #[OA\Post(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Color::class,
+                    type: Type::class,
                     groups: ['pen:create'],
                 )
             )
         )
     )]
-    #[OA\Tag(name: 'Colors')]
+    #[OA\Tag(name: 'Type')]
     public function add(
         Request $request,
         EntityManagerInterface $em,
-        ColorRepository $colorRepository,
+        TypeRepository $typeRepository,
     ): JsonResponse {
         try {
             // On recupère les données du corps de la requête
@@ -88,14 +88,14 @@ class ColorController extends AbstractController
             $faker = Factory::create();
 
             // On traite les données pour créer un nouveau Stylo
-            $color = new Color();
-            $color->setName($data['name']);
+            $type = new Type();
+            $type->setName($data['name']);
 
             
-            $em->persist($color);
+            $em->persist($type);
             $em->flush();
 
-            return $this->json($color, context:[
+            return $this->json($type, context:[
                 'groups' => ['pen:read'],
             ]);
         } catch (\Exception $e) {
@@ -106,31 +106,31 @@ class ColorController extends AbstractController
         }
     }
 
-    #[Route('/color/{id}', name: 'app_color_update', methods: ['PUT','PATCH'])]
+    #[Route('/type/{id}', name: 'app_type_update', methods: ['PUT','PATCH'])]
     #[OA\Response(
         response: 200,
-        description: 'Mets a jour les couleurs.',
+        description: 'Mets a jour les tpe de stylo.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Color::class, groups: ['pen:update','color:update']))
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['pen:update','type:update']))
         )
     )]
     #[OA\Put(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Color::class,
+                    type: Type::class,
                     groups: ['pen:update'],
                 )
             )
         )
     )]
-    #[OA\Tag(name: 'Colors')]
+    #[OA\Tag(name: 'Type')]
     public function update(
-        Color $color,
+        Type $type,
         Request $request,
         EntityManagerInterface $em,
-        ColorRepository $colorRepository,
+        TypeRepository $typeRepository,
     ): JsonResponse {
         try {
             // On recupère les données du corps de la requête
@@ -138,12 +138,12 @@ class ColorController extends AbstractController
             $data = json_decode($request->getContent(), true);
 
             // On traite les données pour créer un nouveau Stylo
-            $color->setName($data['name']);
+            $type->setName($data['name']);
     
-            $em->persist($color);
+            $em->persist($type);
             $em->flush();
 
-            return $this->json($color, context:[
+            return $this->json($type, context:[
                 'groups' => ['pen:read'],
             ]);
         } catch (\Exception $e) {
@@ -154,14 +154,14 @@ class ColorController extends AbstractController
         }
     }
 
-    #[Route('/color/{id}', name: 'app_color_delete', methods: ['DELETE'])]
-    #[OA\Tag(name: 'Colors')]
-    public function delete(Color $color, EntityManagerInterface $em): JsonResponse{
-        $em->remove($color);
+    #[Route('/type/{id}', name: 'app_type_delete', methods: ['DELETE'])]
+    #[OA\Tag(name: 'Type')]
+    public function delete(Type $type, EntityManagerInterface $em): JsonResponse{
+        $em->remove($type);
         $em->flush();
         return $this->json([
             'code'=> 200,
-            'message'=> 'Couleur supprimé',
+            'message'=> 'Type de stylo supprimé',
         ]);
     }
 }

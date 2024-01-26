@@ -11,13 +11,15 @@ use App\Entity\Type;
 use App\Entity\Material;
 use App\Entity\Color;
 use App\Entity\Brand;
+use App\Entity\User;
 
 class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
         $faker = Factory::create();
-
+        $this->createAdmin($manager);
+        $this->createUser($manager);
         // Création des types
         $types = [];
         foreach (['Bille', 'Plume', 'Rollerball', 'Feutre'] as $typeName) {
@@ -74,6 +76,28 @@ class AppFixtures extends Fixture
             $manager->persist($pen);
         }
 
+        $manager->flush();
+    }
+
+    public function createAdmin(ObjectManager $manager) {
+        $user = new User();
+
+        $user->setEmail('demo@apipen.fr');
+        $user->setPassword(password_hash('azerty', PASSWORD_DEFAULT));
+        $user->setRoles(array('ROLE_ADMIN'));
+
+        $manager->persist($user);
+        $manager->flush();
+    }
+
+    public function createUser(ObjectManager $manager) {
+        $user = new User();
+
+        $user->setEmail('demo-user@apipen.fr');
+        $user->setPassword(password_hash('azerty', PASSWORD_DEFAULT));
+        $user->setRoles(array('ROLE_USER'));
+
+        $manager->persist($user);
         $manager->flush();
     }
 }
