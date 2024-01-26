@@ -20,23 +20,22 @@ class PenType extends AbstractType
             ->add('name')
             ->add('price')
             ->add('description')
-            ->add('ref')
             ->add('Type', EntityType::class, [
                 'class' => Type::class,
-'choice_label' => 'id',
+'choice_label' => 'name',
             ])
             ->add('material', EntityType::class, [
                 'class' => Material::class,
-'choice_label' => 'id',
+'choice_label' => 'name',
             ])
             ->add('color', EntityType::class, [
                 'class' => Color::class,
-'choice_label' => 'id',
+'choice_label' => 'name',
 'multiple' => true,
             ])
             ->add('brand', EntityType::class, [
                 'class' => Brand::class,
-'choice_label' => 'id',
+'choice_label' => 'name',
             ])
         ;
     }

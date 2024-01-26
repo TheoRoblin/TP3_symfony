@@ -15,11 +15,10 @@ use App\Entity\User;
 
 class AppFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function createDB(ObjectManager $manager)
     {
         $faker = Factory::create();
-        $this->createAdmin($manager);
-        $this->createUser($manager);
+
         // Création des types
         $types = [];
         foreach (['Bille', 'Plume', 'Rollerball', 'Feutre'] as $typeName) {
@@ -100,4 +99,12 @@ class AppFixtures extends Fixture
         $manager->persist($user);
         $manager->flush();
     }
+
+    public function load(ObjectManager $manager) {
+        $this->createDB($manager);
+        $this->createAdmin($manager);
+        $this->createUser($manager);
+
+    }
+
 }

@@ -2,14 +2,15 @@
 
 namespace App\Controller\Admin;
 
+use Faker\Factory;
 use App\Entity\Pen;
 use App\Form\PenType;
 use App\Repository\PenRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/pen/admin')]
 class PenAdminController extends AbstractController
@@ -25,11 +26,13 @@ class PenAdminController extends AbstractController
     #[Route('/new', name: 'app_pen_admin_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $faker = Factory::create();
         $pen = new Pen();
         $form = $this->createForm(PenType::class, $pen);
         $form->handleRequest($request);
-
+        
         if ($form->isSubmitted() && $form->isValid()) {
+            $pen->setRef($faker->unique()->ean13);
             $entityManager->persist($pen);
             $entityManager->flush();
 

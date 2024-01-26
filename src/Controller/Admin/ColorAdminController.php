@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Color;
-use App\Form\ColorType;
+use App\Form\PenColorType;
 use App\Repository\ColorRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,10 +26,11 @@ class ColorAdminController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $color = new Color();
-        $form = $this->createForm(ColorType::class, $color);
+        $form = $this->createForm(PenColorType::class, $color);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
+            
             $entityManager->persist($color);
             $entityManager->flush();
 
@@ -53,7 +54,7 @@ class ColorAdminController extends AbstractController
     #[Route('/{id}/edit', name: 'app_color_admin_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Color $color, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(ColorType::class, $color);
+        $form = $this->createForm(PenPenColorType::class, $color);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
